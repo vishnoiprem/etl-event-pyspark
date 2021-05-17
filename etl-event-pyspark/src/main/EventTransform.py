@@ -5,21 +5,12 @@ import os
 from pathlib import Path
 from pyspark.sql.session import SparkSession
 import logging
-from datetime import datetime
-from importlib_resources import files
+from jsonschema import validate, ValidationError, SchemaError
 
-
-class EventTransform(object):
-
-    def print_df(self):
-        print('rating')
-
-
-# /* Reads file in the resource path and returns the content
-#     *
-#     * @param filename name of the file
-#     * @return String content of resource path file
-#     */
+#  Reads file in the resource path and returns the content
+#      @param filename name of the file
+#      @return String content of resource path file
+#
 def loadResource(filename):
     current_path = Path(os.path.dirname(os.path.realpath(__file__)))
     resources="/resources"
@@ -28,8 +19,12 @@ def loadResource(filename):
     return f_read
 
 
+
+
+
 def loadCleansedData(spark, path):
     eventDF = spark.read.json(path)
+    # eventDF.printSchema()
     eventDF.createOrReplaceTempView("event")
     cleansedDF = spark.sql(loadResource("/sql/cleansing.sql"))
     cleansedDF.createOrReplaceTempView("event_master")
@@ -37,12 +32,11 @@ def loadCleansedData(spark, path):
 
 
   #
-  # /** Performs transformation at user level and saves the result as external hive table in CSV format
-  #   *
-  #   * @param spark Spark Session created
-  #   * @param userTableLoc path of external hive table
-  #   *
-  #   */
+  #  Performs transformation at user level and saves the result as external hive table in CSV format
+  #   @param spark Spark Session created
+  #   @param userTableLoc path of external hive table
+  #
+  #
 
 def userTransform(spark, userTableLoc):
 
@@ -67,12 +61,12 @@ def userTransform(spark, userTableLoc):
     spark.sql("SELECT * FROM user_details").show()
 
 
-  # /** Performs transformation at hourly level and saves the result as external hive table in CSV format
-  #   *
-  #   * @param spark Spark Session created
-  #   * @param activityTableLoc path of external hive table
-  #   *
-  #   */
+  #  Performs transformation at hourly level and saves the result as external hive table in CSV format
+  #
+  #    @param spark Spark Session created
+  #    @param activityTableLoc path of external hive table
+  #
+  #
 
 def activityTransform(spark, activityTableLoc):
     activityDF=spark.sql(loadResource("/sql/activity_transform.sql"))
@@ -128,6 +122,22 @@ def findPopularTrade(spark, tradeTableLoc):
     #demo purpose
 
 
+def json_schema_validator(spark,dataschema, path):
+    # eventDF = spark.read.json(path)
+    # eventDF.printSchema()
+    # dataDF = spark.read.option("multiline",True).json(dataschema)
+    # dataDF_schema= dataDF.printSchema
+    try:
+        validate(path, dataschema)
+    except SchemaError as e:
+        print("There is an error with the schema")
+
+    except ValidationError as e:
+        print(e)
+        print("---------")
+        print(e.absolute_path)
+        print("---------")
+        print(e.absolute_schema_path)
 
 
 
@@ -150,6 +160,9 @@ if __name__ == "__main__":
 
     args1 = "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json"
     args2 = "/Users/vishnoiprem/tmp/etl/"
+    args3 = "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_data_schema.json"
+
+    json_schema_validator(spark, args3, args1)
 
     logger.info("1.Lets make data clean")
     loadCleansedData(spark, args1)
