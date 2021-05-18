@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue May 18 09:45:36 SGT 2021:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0179-7d26-59ed-00001c8a5e00 
+on database directory /Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/metastore_db with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@42110406 
+Loaded from file:/usr/local/Cellar/apache-spark/3.0.1/libexec/jars/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=11.0.9+11
+user.dir=/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.16
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

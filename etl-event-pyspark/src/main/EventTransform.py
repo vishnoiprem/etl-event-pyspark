@@ -6,6 +6,7 @@ from pathlib import Path
 from pyspark.sql.session import SparkSession
 import logging
 from jsonschema import validate, ValidationError, SchemaError
+import  sys
 
 #  Reads file in the resource path and returns the content
 #      @param filename name of the file
@@ -160,9 +161,17 @@ if __name__ == "__main__":
 
     args1 = "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json"
     args2 = "/Users/vishnoiprem/tmp/etl/"
-    args3 = "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_data_schema.json"
 
-    json_schema_validator(spark, args3, args1)
+    n = len(sys.argv)
+    print("Total arguments passed:", n)
+    print("\nName of Python script:", sys.argv[0])
+    if n<3:
+        print(' please passs file schema and data file name with path ')
+        sys.exit(200)
+
+    args1=sys.argv[1]
+    args2=sys.argv[2]
+
 
     logger.info("1.Lets make data clean")
     loadCleansedData(spark, args1)
