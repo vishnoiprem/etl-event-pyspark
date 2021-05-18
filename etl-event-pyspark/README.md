@@ -1,5 +1,6 @@
 ETL pipeline using Apache Spark SQL
 1)install requirements.txt file
+sudo pip3 install -r requirements.txt
 
 
 
