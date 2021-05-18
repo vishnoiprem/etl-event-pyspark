@@ -1,7 +1,9 @@
 ETL pipeline using Apache Spark SQL
+1)install requirements.txt file
 
 
-install : hive to local ( if want to check data )
+
+2)install : hive to local ( if want to check data )
 
 https://luckymrwang.github.io/2018/03/14/Install-hive-on-Mac-with-Homebrew/
 
@@ -15,7 +17,7 @@ python src/main/validate_json.py "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/
 
 
 
-
+3)
 Why Spark SQL?
 
 Spark SQL brings native support for SQL to Spark and streamlines the process of querying data stored both in DataFrame  and in external sources. 
@@ -34,6 +36,9 @@ Spark SQL also includes a cost-based optimizer, columnar storage, and code gener
 Implementation:
 This project aims to do 3 sets of transformations. A cleansing task is done initially inorder to maintain uniformity in data pattern. (Urls were not following a uniform pattern where https:// is missing for a few records)
 
+4)
+
+
 
 spark-submit src/main/EventTransform.py  ${input_data_location} ${outpuETL pipeline using Apache Spark SQL
 
@@ -42,6 +47,5 @@ spark-submit src/main/EventTransform.py  ${input_data_location} ${outpuETL pipel
 Run SQL queries over imported JSON data and existing dataframes
 
 spark-submit src/main/EventTransform.py  ${input_data_file} ${output_table_location}
-
 
 spark-submit src/main/EventTransform.py "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json" "/Users/vishnoiprem/tmp/etl"
