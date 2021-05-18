@@ -10,8 +10,8 @@ import  sys
 from datetime import date, timedelta
 
 #  Reads file in the resource path and returns the content
-#     param filename name of the file
-#    return String content of resource path file
+#  param filename name of the file
+#  return String content of resource path file
 #
 def loadResource(filename):
     current_path = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -122,13 +122,12 @@ def findPopularTrade(spark, tradeTableLoc,ds ,y_ds):
             ,search_frequency STRING
         )
         PARTITIONED BY (ds STRING)
-        
         ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '{}'
      """.format(tradeTableLoc)
     spark.sql(s_ct)
 
     spark.sql(loadResource("/sql/s_trade_demand_df.sql").format(ds=ds,y_ds=y_ds))
-    spark.sql("SELECT * FROM s_trade_demand_df").show()
+    spark.sql("SELECT * FROM s_trade_demand_df where ds = (select MAX(ds) as ds from s_trade_demand_df) ").show()
     #demo purpose
 
 
@@ -188,10 +187,7 @@ if __name__ == "__main__":
 
     #
 
-
-
-
-    logger.info("1.Lets make data clean")
+    logger.info("1.Let's make data clean")
     loadCleansedData(spark, args1)
     logger.info("1.Cleansed JSON load completed")
 

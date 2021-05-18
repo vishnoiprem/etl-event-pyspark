@@ -11,6 +11,7 @@ def print_hi(name):
     ds=time.strftime('%Y%m%d')
     y_ds=time.strftime('%Y%m%d')
     print(ds,y_ds)
+    ''.replace('trade_demand', 's_trade_demand_df')
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

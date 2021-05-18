@@ -39,14 +39,6 @@ spark-submit src/main/EventTransform.py  ${input_data_location} ${outpuETL pipel
 
 
 
-Why Spark SQL?
-
-Spark SQL brings native support for SQL to Spark and streamlines the process of querying data stored both in DataFrame  and in external sources. 
-Spark SQL conveniently blurs the lines between Dataframe and relational tables.
-Unifying these powerful abstractions makes it easy for developers to intermix SQL commands querying external data with complex analytics, 
-all within in a single application.
-Spark SQL is used in this case study to:
-
 Run SQL queries over imported JSON data and existing dataframes
 
 spark-submit src/main/EventTransform.py  ${input_data_file} ${output_table_location}
