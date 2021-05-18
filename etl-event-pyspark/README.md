@@ -1,10 +1,9 @@
 ETL pipeline using Apache Spark SQL
 
 
-install : hive to local 
+install : hive to local ( if want to check data )
 
 https://luckymrwang.github.io/2018/03/14/Install-hive-on-Mac-with-Homebrew/
-
 
 First step is validate json data 
 cd /etl-event-pyspark
@@ -35,27 +34,10 @@ Spark SQL also includes a cost-based optimizer, columnar storage, and code gener
 Implementation:
 This project aims to do 3 sets of transformations. A cleansing task is done initially inorder to maintain uniformity in data pattern. (Urls were not following a uniform pattern where https:// is missing for a few records)
 
-
-spark-submit --class com.etl.exec.EventTransform {jar_location} {input_data_location} {output_table_location}
 
 spark-submit src/main/EventTransform.py  ${input_data_location} ${outpuETL pipeline using Apache Spark SQL
 
 
-install : hive to local 
-
-https://luckymrwang.github.io/2018/03/14/Install-hive-on-Mac-with-Homebrew/
-
-
-First step is validate json data 
-cd /etl-event-pyspark
-
-python src/main/validate_json.py ${json_data_file} ${json_schema_file}
-
-eg:
-python src/main/validate_json.py "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json" "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_data_schema.json"
-
-
-
 
 Why Spark SQL?
 
@@ -66,21 +48,8 @@ all within in a single application.
 Spark SQL is used in this case study to:
 
 Run SQL queries over imported JSON data and existing dataframes
-Easily write RDDs out to Hive tables
+
+spark-submit src/main/EventTransform.py  ${input_data_file} ${output_table_location}
 
 
-Scalability:
-Spark SQL also includes a cost-based optimizer, columnar storage, and code generation to make queries fast. At the same time, it scales to thousands of nodes and multi-hour queries using the Spark engine, which provides full mid-query fault tolerance, without having to worry about using a different engine for historical data.
-
-Implementation:
-This project aims to do 3 sets of transformations. A cleansing task is done initially inorder to maintain uniformity in data pattern. (Urls were not following a uniform pattern where https:// is missing for a few records)
-
-
-spark-submit --class com.etl.exec.EventTransform {jar_location} {input_data_location} {output_table_location}
-
-spark-submit src/main/EventTransform.py  ${input_data_location} ${output_table_location}
-
-spark-submit src/main/EventTransform.py "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json" "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_data_schema.json"
-t_table_location}
-
-spark-submit src/main/EventTransform.py "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json" "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_data_schema.json"
+spark-submit src/main/EventTransform.py "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json" "/Users/vishnoiprem/tmp/etl"
