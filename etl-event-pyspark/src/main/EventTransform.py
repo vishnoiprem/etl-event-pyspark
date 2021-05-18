@@ -7,10 +7,11 @@ from pyspark.sql.session import SparkSession
 import logging
 from jsonschema import validate, ValidationError, SchemaError
 import  sys
+from datetime import date, timedelta
 
 #  Reads file in the resource path and returns the content
-#      @param filename name of the file
-#      @return String content of resource path file
+#     param filename name of the file
+#    return String content of resource path file
 #
 def loadResource(filename):
     current_path = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -19,10 +20,6 @@ def loadResource(filename):
     f_read=open(fname, 'r').read()
     return f_read
 
-
-
-
-
 def loadCleansedData(spark, path):
     eventDF = spark.read.json(path)
     # eventDF.printSchema()
@@ -30,14 +27,9 @@ def loadCleansedData(spark, path):
     cleansedDF = spark.sql(loadResource("/sql/cleansing.sql"))
     cleansedDF.createOrReplaceTempView("event_master")
 
-
-
-  #
-  #  Performs transformation at user level and saves the result as external hive table in CSV format
-  #   @param spark Spark Session created
-  #   @param userTableLoc path of external hive table
-  #
-  #
+#  Performs transformation at user level and saves the result as external hive table in CSV format
+#   @param spark Spark Session created
+#   @param userTableLoc path of external hive table#
 
 def userTransform(spark, userTableLoc):
 
@@ -99,7 +91,7 @@ def activityTransform(spark, activityTableLoc):
   # @param tradeTableLoc path of external hive table
   #
 
-def findPopularTrade(spark, tradeTableLoc):
+def findPopularTrade(spark, tradeTableLoc,ds ,y_ds):
 
     tradeDF=spark.sql(loadResource("/sql/trade_demand_transform.sql"))
     tradeDF.coalesce(1).write\
@@ -107,7 +99,6 @@ def findPopularTrade(spark, tradeTableLoc):
     .mode('overwrite') \
     .option("nullValue", "NULL")\
     .save(tradeTableLoc)
-
     ct="""
         CREATE EXTERNAL TABLE IF NOT EXISTS trade_demand 
         (
@@ -117,17 +108,31 @@ def findPopularTrade(spark, tradeTableLoc):
         )
         ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '{}'
      """.format(tradeTableLoc)
-
     spark.sql(ct)
     spark.sql("SELECT * FROM trade_demand").show()
+
+    #demo purpose
+    tradeTableLoc=tradeTableLoc.replace('trade_demand','s_trade_demand_df')
+    print(tradeTableLoc)
+    s_ct="""
+        CREATE EXTERNAL TABLE IF NOT EXISTS s_trade_demand_df
+        (
+            month_bucket STRING
+            ,trade STRING
+            ,search_frequency STRING
+        )
+        PARTITIONED BY (ds STRING)
+        
+        ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LOCATION '{}'
+     """.format(tradeTableLoc)
+    spark.sql(s_ct)
+
+    spark.sql(loadResource("/sql/s_trade_demand_df.sql").format(ds=ds,y_ds=y_ds))
+    spark.sql("SELECT * FROM s_trade_demand_df").show()
     #demo purpose
 
 
 def json_schema_validator(spark,dataschema, path):
-    # eventDF = spark.read.json(path)
-    # eventDF.printSchema()
-    # dataDF = spark.read.option("multiline",True).json(dataschema)
-    # dataDF_schema= dataDF.printSchema
     try:
         validate(path, dataschema)
     except SchemaError as e:
@@ -146,6 +151,8 @@ if __name__ == "__main__":
     # Spark start point
     spark = SparkSession.builder \
         .appName("Spark-Hipages  SQL ETL App") \
+        .config("hive.exec.dynamic.partition", "true") \
+        .config("hive.exec.dynamic.partition.mode", "nonstrict") \
         .config("spark.driver.host", "localhost") \
         .enableHiveSupport() \
         .getOrCreate()
@@ -158,7 +165,7 @@ if __name__ == "__main__":
     logger.info("module imported and logger initialized")
 
     # input and outout file varicable.
-
+    print('this is for example ')
     args1 = "/Users/vishnoiprem/OwnProject/OwnPoc/Learning/17-etl/etl-event-pyspark/src/main/resources/input/source_event_data.json"
     args2 = "/Users/vishnoiprem/tmp/etl/"
 
@@ -171,6 +178,17 @@ if __name__ == "__main__":
 
     args1=sys.argv[1]
     args2=sys.argv[2]
+
+    #spark properties
+
+    today = date.today()
+    yesterday_ds = (today - timedelta(days=1)).strftime('%Y%m%d')
+    ds = today.strftime('%Y%m%d')
+    print(ds,yesterday_ds)
+
+    #
+
+
 
 
     logger.info("1.Lets make data clean")
@@ -190,6 +208,6 @@ if __name__ == "__main__":
 
     logger.info("4.Frequently searched trade transform started")
     tradeTableLoc = args2 + "/trade_demand/"
-    findPopularTrade(spark,tradeTableLoc)
+    findPopularTrade(spark,tradeTableLoc,ds , yesterday_ds)
     logger.info("4.Frequently searched trade transform completed")
     spark.stop()
